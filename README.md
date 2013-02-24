@@ -19,7 +19,7 @@ You can install them with jruby like this:
 
 (-S runs the command following it on the CLI of the JVM)
 
-Usage: (j)ruby evest.rb [systemID] (if you don't specify a systemid, it will scrape from the 5 major trade hubs)
+Usage: (j)ruby evest.rb -m 1.0 systemID (profit margin defaults to 100% (1.0) - if you don't specify a systemid, it will scrape from the 5 major trade hubs)
 
 Output usage: (j)ruby evest.rb -o > my_csv_name.csv
 

@@ -1,7 +1,7 @@
 evest
 =====
 
-It's best to run this in jruby (http://jruby.org/) to take advantage of java threading.
+It's best to run this in jruby (http://jruby.org/) to take advantage of JVM threading.
 
 You need to install mongodb (http://www.mongodb.org/).
 

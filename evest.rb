@@ -22,6 +22,8 @@ $systems	= {
 	30002053	=> "Hek"
 }
 
+$margin = 1.0
+
 #add the is_number? function to the String class so that we can check if command line arguments are a valid number.
 class String
   def is_number?
@@ -82,16 +84,16 @@ def process_data (response, name, typeid, col, sysid)
 		gross = g.call(buy_volume, buy_max_price, sell_volume, sell_min_price)				
 		vol = sell_volume + buy_volume
 		#if all values are over zero and it grosses over a billion isk a day in trade, store the data
-		if q.call(buy_volume, sell_volume, buy_max_price, sell_min_price) && gross > 1000000000 && vol > 1000 && sell_volume > buy_volume
+		if q.call(buy_volume, sell_volume, buy_max_price, sell_min_price) && gross > 1000000000 #&& vol > 1000 && sell_volume > buy_volume
 			#f is the split
 			spread = f.call(sell_min_price, buy_max_price)
 			readablespread = y.call(spread)
-			if spread >= 1 #&& spread <= 10
+			if spread >= $margin
 				#prep the data for mongo
 				rec = {
-					"systemid"			=> sysid,
-					"typeid"			=> typeid,
-					"name"				=> name,
+					:systemid			=> sysid,
+					:TypeID			=> typeid,
+					:name				=> name,
 					"content_type"		=> "market_record",						
 					"buy_max_price"		=> buy_max_price, 
 					"sell_min_price"	=> sell_min_price,
@@ -101,6 +103,7 @@ def process_data (response, name, typeid, col, sysid)
 					"spread"			=> spread,
 					"timestamp"			=> Time.now
 				}
+				rec[:system_id]
 				#if a record for this typeid doesn't exist, insert one.
 				if col.find({"typeid" => typeid, "systemid" => sysid}).to_a.empty?
 					id = col.insert(rec)
@@ -116,7 +119,7 @@ def process_data (response, name, typeid, col, sysid)
 				puts "ignored: sys - #{$systems[sysid]}	lo_sprd	name - #{name}\n"						
 				end
 		else
-			#clean out any that have fallen outside the parameters
+			#clean out any that have fallen outside the parameters - hate duplicating code, but whatever.
 			col.remove({"typeid" => typeid, "systemid" => sysid})
 			puts "ignored: sys - #{$systems[sysid]}	lo_vol	name - #{name}\n"
 		end
@@ -125,13 +128,16 @@ end
 
 tmp = nil
 
-ARGV.each{ |a|
+ARGV.each_with_index{ |a, i|
 	if a == "-o"
 		output($coll)
 	end
 	if a == "-d"
 		$coll.remove
 		exit
+	end 
+	if a== "-m"
+		$margin = ARGV[i + 1].to_f
 	end
 	if $systems.keys.include?(a.to_i)
 		tmp.push({ a.to_i => $systems[a.to_i] }) rescue tmp = { a.to_i => $systems[a.to_i] }

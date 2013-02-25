@@ -1,6 +1,8 @@
 evest
 =====
 
+This script scrapes market data for any (or all) of the 5 trade hubs - jita, amarr, rens, dodixie, and hek. You give it a margin of profit that you would like between the highest buy order and the lowest sell order, and it generates a list of things that match your criteria.
+
 It's best to run this in jruby (http://jruby.org/) to take advantage of JVM threading.
 
 You need to install mongodb (http://www.mongodb.org/).
